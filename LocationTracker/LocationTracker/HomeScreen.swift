@@ -50,8 +50,7 @@ class HomeScreen: UIViewController,CLLocationManagerDelegate {
     //MARK: Location Permission and methods
     
    func requestPermission() {
-        locationManager?.requestAlwaysAuthorization()
-        
+        locationManager?.requestWhenInUseAuthorization()
 
     }
     
@@ -87,16 +86,21 @@ class HomeScreen: UIViewController,CLLocationManagerDelegate {
     
     @IBAction func start_click(_ sender: Any) {
         
-        if (!permissionGranted) {
+        print("location status>> \(String(describing: locationManager?.authorizationStatus.rawValue))")
+        
+        if (locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedAlways || locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedWhenInUse) {
+            
+            let trackervc = self.storyboard?.instantiateViewController(withIdentifier: "TrackerScreen") as! TrackerScreen
+            self.navigationController?.pushViewController(trackervc, animated: true)
+            
+        }
+        else {
             
             let alert = UIAlertController(title: "Error", message: "Location permission not granted. Select 'Request Permission' first.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
             self.present(alert, animated: true, completion: nil)
-        }
-        else {
             
-            let trackervc = self.storyboard?.instantiateViewController(withIdentifier: "TrackerScreen") as! TrackerScreen
-            self.navigationController?.pushViewController(trackervc, animated: true)
+            
         }
         
         
@@ -137,10 +141,10 @@ class HomeScreen: UIViewController,CLLocationManagerDelegate {
         geoCoder.reverseGeocodeLocation(location, completionHandler: { (placemarks, error) -> Void in
             if let placemarks = placemarks, placemarks.count > 0 {
                 let placemark = placemarks[0]
-                let addressDictionary = placemark.name;
+                let addressDictionary = placemark.addressDictionary;
                 print("source address: \(String(describing: addressDictionary))")
                 print("placemark: \(String(describing: placemark))")
-               // annotation.title = addressDictionary!["Name"] as? String
+                annotation.title = addressDictionary!["Name"] as? String
                     self.mapView.addAnnotation(annotation)
                 }
             })
