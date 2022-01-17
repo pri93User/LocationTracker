@@ -47,6 +47,10 @@ class PathScreen: UIViewController,MKMapViewDelegate {
     
     @IBAction func start_click(_ sender: Any) {
         
+
+            let trackervc = self.storyboard?.instantiateViewController(withIdentifier: "TrackerScreen") as! TrackerScreen
+            self.navigationController?.pushViewController(trackervc, animated: true)
+        
     }
     func showPathOnMAp()  {
         
@@ -77,7 +81,7 @@ class PathScreen: UIViewController,MKMapViewDelegate {
                 print("source address: \(String(describing: addressDictionary))")
 
                 sourceAnnotation.title = addressDictionary!["Name"] as? String
-                self.mapView.addAnnotation(sourceAnnotation)
+ //               self.mapView.addAnnotation(sourceAnnotation)
                 }
             })
                 
@@ -94,10 +98,11 @@ class PathScreen: UIViewController,MKMapViewDelegate {
                 let addressDictionary = placemark.addressDictionary
                 print("destination address: \(addressDictionary)")
                 destinationAnnotation.title = addressDictionary!["Name"] as? String
-                self.mapView.addAnnotation(destinationAnnotation)
+//                self.mapView.addAnnotation(destinationAnnotation)
                 }
             })
       
+        self.mapView.addAnnotations([sourceAnnotation,destinationAnnotation])
         let directionRequest = MKDirections.Request()
         directionRequest.source = sourceMapItem
         directionRequest.destination = destinationMapItem

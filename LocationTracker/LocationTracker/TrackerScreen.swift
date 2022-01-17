@@ -173,7 +173,7 @@ class TrackerScreen: UIViewController,CLLocationManagerDelegate {
                 showDistance(distanceMeter: distanceInMeter)
             }
             
-            
+            showCurrentLocation(location: location)
             
             locationArray.add(location)
             print("locationArray :: \(String(describing: locationArray))")
@@ -194,5 +194,28 @@ class TrackerScreen: UIViewController,CLLocationManagerDelegate {
         let pathvc = self.storyboard?.instantiateViewController(withIdentifier: "PathScreen") as! PathScreen
         pathvc.infoDict = data
         self.navigationController?.pushViewController(pathvc, animated: true)
+    }
+    
+    //MARK: Show current location on map
+    func showCurrentLocation(location:CLLocation)  {
+        
+       
+        let center = CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
+        let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+        mapView.setRegion(region, animated: true)
+        
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = location.coordinate
+        let geoCoder = CLGeocoder ()
+        geoCoder.reverseGeocodeLocation(location, completionHandler: { (placemarks, error) -> Void in
+            if let placemarks = placemarks, placemarks.count > 0 {
+                let placemark = placemarks[0]
+                let addressDictionary = placemark.addressDictionary;
+                print("source address: \(String(describing: addressDictionary))")
+                print("placemark: \(String(describing: placemark))")
+                annotation.title = addressDictionary!["Name"] as? String
+                    self.mapView.addAnnotation(annotation)
+                }
+            })
     }
 }
